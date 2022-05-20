@@ -1,4 +1,4 @@
-import os,sys,check_version,time
+import os, sys, check_version, time
 
 class Resource():
     def __init__(self, name, planets=["ALL"]):
@@ -259,25 +259,28 @@ ALL_RESOURCES["BUILDINGS_3"] = {
     "LARGE SHUTTLE": Object("LARGE SHUTTLE", ALL_RESOURCES["COMP_RESOURCES_3"]["TITANIUM ALLOY"], ALL_RESOURCES["SMELTED_RESOURCES"]["CERAMIC"], ALL_RESOURCES["BUILDINGS_2"]["EXO CHIP"], ALL_RESOURCES["BUILDINGS_2"]["EXO CHIP"], bytes=5000, tier=4),
 }
 
+def get_item_info(tab, times, item):
+    return f"{'    ' * tab}{times}{item.name} ({item.type}"
+
 def lookup(item, tab=1, times=""):
 
     if isinstance(item, Resource): # Is Resource
-        return f"{'    '*(tab-1)}{times}{item.name} ({item.type}):\n{'    '*(tab+0)}Planets: {', '.join(item.planets)}"
+        return f"{get_item_info(tab-1, times, item)}):\n{'    '*(tab+0)}Planets: {', '.join(item.planets)}"
     
     elif isinstance(item, RefinedResource): # Is Smelted Resource
-        return f"{'    '*(tab-1)}{times}{item.name} ({item.type}):\n{'    '*(tab+0)}{item.smeltedFrom.name} ({item.smeltedFrom.type}):\n{'    '*(tab+1)}Planets: {', '.join(item.smeltedFrom.planets)}"
+        return f"{get_item_info(tab-1, times, item)}):\n{lookup(item.smeltedFrom, tab+1)}"
     
     elif isinstance(item, AtmoResource): # Is Atmospheric Resource (aka Gas)
         atmo = ""
         for i in item.planetsAndPPU:
             atmo += f"{'    '*(tab+0)}{i} ({item.planetsAndPPU[i]} PPU),\n"
-        return f"{'    '*(tab-1)}{item.name} ({item.type}):\n{atmo[:-2]}"
+        return f"{get_item_info(tab-1, '', item)}):\n{atmo[:-2]}"
 
     elif isinstance(item, CompResource): # Is Composite Resource
         if item.res1 == item.res2:
-            info = f"{'    '*(tab-1)}{times}{item.name} ({item.type}):\n{lookup(item.res1, tab+1, 'x2 ')}"
+            info = f"{get_item_info(tab-1, times, item)}):\n{lookup(item.res1, tab+1, 'x2 ')}"
         else:
-            info = f"{'    '*(tab-1)}{times}{item.name} ({item.type}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}"
+            info = f"{get_item_info(tab-1, times, item)}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}"
         if item.gas: info += "\n"+lookup(item.gas, tab+1)
         return info
 
@@ -285,13 +288,13 @@ def lookup(item, tab=1, times=""):
         if item.res1 == item.res2:
             if item.res2 == item.res3:
                 if item.res3 == item.res4:
-                    info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1, 'x4 ')}"
+                    info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1, 'x4 ')}"
                 else:
-                    info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1, 'x3 ')}"
+                    info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1, 'x3 ')}"
                     if item.res4:
                         info += f"\n{'    '*(tab-1)}{lookup(item.res4, tab+1)}"
             else:
-                info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1, 'x2 ')}"
+                info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1, 'x2 ')}"
                 if item.res3:
                     if item.res3 == item.res4:
                         info += f"\n{'    '*(tab-1)}{lookup(item.res3, tab+1, 'x2 ')}"
@@ -300,22 +303,22 @@ def lookup(item, tab=1, times=""):
                         if item.res4:
                             info += f"\n{'    '*(tab-1)}{lookup(item.res4, tab+1)}"
         elif item.res2 and item.res2 == item.res3:
-            info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}"
+            info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}"
             if item.res3 == item.res4:
-                info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res3, tab+1, 'x3 ')}"
+                info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res3, tab+1, 'x3 ')}"
             else:
                 info += f"\n{'    '*(tab-1)}{lookup(item.res3, tab+1, 'x2 ')}"
                 if item.res4:
                     info += f"\n{'    '*(tab-1)}{lookup(item.res4, tab+1)}"
         else:
             if not item.res2:
-                info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}"
+                info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}"
             elif not item.res3:
-                info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}"
+                info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}"
             elif not item.res4:
-                info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}\n{lookup(item.res3, tab+1)}"
+                info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}\n{lookup(item.res3, tab+1)}"
             else:
-                info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}"
+                info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}"
                 if item.res3:
                     if item.res3 == item.res4:
                         info += f"\n{'    '*(tab-1)}{lookup(item.res3, tab+1, 'x2 ')}"
@@ -324,7 +327,7 @@ def lookup(item, tab=1, times=""):
                         if item.res4:
                             info += f"\n{'    '*(tab-1)}{lookup(item.res4, tab+1)}"
                 else:
-                    info = f"{'    '*(tab-1)}{times}{item.name} ({item.type} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}\n{lookup(item.res3, tab+1)}\n{lookup(item.res4, tab+1)}"
+                    info = f"{get_item_info(tab-1, times, item)} | Tier {item.tier}):\n{lookup(item.res1, tab+1)}\n{lookup(item.res2, tab+1)}\n{lookup(item.res3, tab+1)}\n{lookup(item.res4, tab+1)}"
         info += f"\n{'    '*(tab+0)}{item.bytes} BYTES"
         return info
 
@@ -339,71 +342,75 @@ def close():
     sys.exit()
 
 def help():
-    check_version.run(1.2, "astroneerlookup", "https://github.com/Isangedal/Astroneer-Lookup/releases/latest/download/Astroneer.Lookup.exe")
+    print("Please wait...")
+    check_version.run(1.21, "astroneerlookup", "https://github.com/Isangedal/Astroneer-Lookup/releases/latest/download/Astroneer.Lookup.exe")
     print("\n\nWelcome to Astroneer Lookup!\n\nType a resource name or the name of a building to find out how to make it!\nType \"/items\" or \"/buildings\" (without the \"\") to see which items and buildings you can ask for\nType \"/exit\" to close the program\nType \"/help\" to view this message at any time\n\n")
 
-os.system("title Astroneer Lookup")
+if sys.platform == "win32": os.system("title Astroneer Lookup") # How to rename window in windows
+else: print('\33]0;Astroneer Lookup\a', end='', flush=True) # How to rename window in linux/mac
+
 clear()
 help()
 
-try:
-    while True:
+while True:
+    
+    req = input("Lookup: ").lower()
+
+    clear()
+
+    if req.startswith("/"): # Commands
+
+        if req == "/items": # Display all items
+
+            for i in ALL_RESOURCES:
+                if i in ["RESOURCES", "SMELTED_RESOURCES", "ATMO_RESOURCES"]:
+                    m = f"{i.replace('_', ' ')}:\n"
+                    for v in ALL_RESOURCES[i]:
+                        m += f"    {v.lower().capitalize()}\n"
+                    print(m)
+
+                elif i in ["COMP_RESOURCES_1", "COMP_RESOURCES_2", "COMP_RESOURCES_3", "COMP_RESOURCES_4"]:
+                    if i == "COMP_RESOURCES_1":
+                        print("COMP RESOURCES:")
+                    for v in ALL_RESOURCES[i]:
+                        print(f"    {v.lower().capitalize()}")
+            print("\n")
+
+        elif req == "/buildings": # Display all buildings
+
+            tier = input("Which tier of buildings do you want to see?\n")
+
+            clear()
+
+            try:
+                if int(tier) > 4 or int(tier) < 1: 0+""
+            except:
+                print(f"Could not find tier \"{tier}\"\nThe available tiers are: 1, 2, 3, 4\n\n")
+                continue
+            print(f"Tier {tier} buildings:\n")
+            for i in ALL_RESOURCES:
+                if i in ["BUILDINGS", "BUILDINGS_2", "BUILDINGS_3"]:
+                    for v in ALL_RESOURCES[i]:
+                        if ALL_RESOURCES[i][v].tier == int(tier):
+                            print(f"{v.lower().capitalize()}")
+            print("\n")
+                    
+        elif req == "/exit": # Exit program
+            close()
         
-        req = input("Lookup: ")
+        elif req == "/help": # Display the help message
+            help()
 
-        clear()
-
-        if req.startswith("/"): # Commands
-
-            if req.lower() == "/items": # Display all items
-                for i in ALL_RESOURCES:
-                    if i in ["RESOURCES", "SMELTED_RESOURCES", "ATMO_RESOURCES"]:
-                        m = f"{i.replace('_', ' ')}:\n"
-                        for v in ALL_RESOURCES[i]:
-                            m += f"    {v.lower().capitalize()}\n"
-                        print(m)
-                    elif i in ["COMP_RESOURCES_1", "COMP_RESOURCES_2", "COMP_RESOURCES_3", "COMP_RESOURCES_4"]:
-                        if i == "COMP_RESOURCES_1":
-                            print("COMP RESOURCES:")
-                        for v in ALL_RESOURCES[i]:
-                            print(f"    {v.lower().capitalize()}")
-                print("\n")
-
-            elif req.lower() == "/buildings": # Display all buildings
-                tier = input("Which tier of buildings do you want to see?\n")
-                clear()
-                try:
-                    if int(tier) > 4 or int(tier) < 1: 0+""
-                except:
-                    print(f"Could not find tier \"{tier}\"\nThe available tiers are: 1, 2, 3, 4\n\n")
-                    continue
-                print(f"Tier {tier} buildings:\n")
-                for i in ALL_RESOURCES:
-                    if i in ["BUILDINGS", "BUILDINGS_2", "BUILDINGS_3"]:
-                        for v in ALL_RESOURCES[i]:
-                            a = ALL_RESOURCES[i][v]
-                            if a.tier == int(tier):
-                                print(f"{v.lower().capitalize()}")
-                print("\n")
-                        
-            elif req.lower() == "/exit": # Exit program
-                close()
+        else:
+            print("Could not find a command with this name!\n")
             
-            elif req.lower() == "/help": # Display the help message
-                help()
+        continue
 
-            else:
-                print("Could not find a command with this name!\n")
-                
-            continue
-            
-        found = False
-        for i in ALL_RESOURCES:
-            if req.upper() in ALL_RESOURCES[i]:
-                print(f"RESOURCE FOUND!\n\n{lookup(ALL_RESOURCES[i][req.upper()])}\n")
-                found = True
+    req = req.upper()
 
-        if not found:
-            print("Could not find a resource with this name!\n")
-except KeyboardInterrupt:
-    close()
+    try:
+        cat = [x for x in ALL_RESOURCES if req in ALL_RESOURCES[x]][0]
+        if req in ALL_RESOURCES[cat]:
+            print(f"RESOURCE FOUND!\n\n{lookup(ALL_RESOURCES[cat][req])}\n")
+    except:
+        print("Could not find a resource with this name!\n")
