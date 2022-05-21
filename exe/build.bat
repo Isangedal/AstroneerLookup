@@ -14,9 +14,7 @@ cd %0\..\
 title Building...
 pip install pyinstaller
 pyinstaller --onefile "../Astroneer Lookup.py" --icon "Astroneer Icon.ico"
-cd dist
-move "Astroneer Lookup.exe" ../..
-cd ..
+move "dist\Astroneer Lookup.exe" ..
 rmdir /S /Q dist
 rmdir /S /Q build
 rmdir /S /Q __pycache__
