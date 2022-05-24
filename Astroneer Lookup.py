@@ -111,6 +111,7 @@ Resource("ASTRONIUM")
 
 # From specific planets
 # ---- Organized - Used for official changes to the codebase ----
+# Resource("[NAME]",   ["[PLANETS]"])
 # Resource("SOIL",     ["EARTH",   "MARS", "JUPITER", "SATURN", "URANUS", "NEPTUNE"])
 # Resource("WATER",    ["EARTH",   "MARS", "SATURN",  "URANUS", "NEPTUNE"])
 Resource("SPHALERITE", ["SYLVA",   "DESOLO"])
@@ -128,6 +129,7 @@ Resource("TITANITE",   ["VESANIA", "DESOLO"])
 
 # All Smelted Resources
 # ---- Organized - Used for official changes to the codebase ----
+# RefinedResource("[NAME]",        "[RESOURCE SMELTED FROM]")
 # RefinedResource("REFINED SOIL",  "SOIL")
 # RefinedResource("REFINED WATER", "WATER")
 RefinedResource("CARBON",   "ORGANIC")
@@ -148,6 +150,7 @@ RefinedResource("TITANIUM", "TITANITE")
 
 # All Gases
 # ---- Organized - Used for official changes to the codebase ----
+# AtmoResource("[NAME]",    {"[PLANET]": "[PPU]"})
 # AtmoResource("RADIATION", {"EARTH": 100, "MARS": 25})
 # AtmoResource("OZONE",     {"EARTH": 100})
 AtmoResource("HELIUM",   {"ATROX":   25})
@@ -165,6 +168,7 @@ AtmoResource("HYDROGEN", {"VESANIA": 100, "SYLVA":   75, "CALIDOR": 50, "NOVUS":
 
 # All Composite Resources
 # ---- Organized - Used for official changes to the codebase ----
+# CompResource("[NAME]",         "RESOURCE 1",     "RESOURCE 2")
 # CompResource("GRAPHENE",       "GRAPHITE",       "HYDRAZINE")
 # CompResource("DIAMOND",        "GRAPHENE",       "GRAPHENE")
 CompResource("RUBBER",           "ORGANIC",        "RESIN")
@@ -187,11 +191,10 @@ CompResource("HYDRAZINE",        "AMMONIUM",       "AMMONIUM", "AMMONIUM", "HYDR
 # ------------------------------------------------------------------------------
 
 # All Buildings
-# All Composite Resources
 # ---- Organized - Used for official changes to the codebase ----
-# CompResource("COMPUTER",       500,  1, "GLASS",            "EXO CHIP")
-# CompResource("SUPER COMPUTER", 1000, 3, "NANOCARBON ALLOY", "TITANIUM ALLOY", "EXO CHIP")
-# Tier 1
+# Object("[NAME]",         [BYTES], [TIER], "RESOURCE 1",       "RESOURCE 2")
+# Object("COMPUTER",       500,     1,      "GLASS",            "EXO CHIP")
+# Object("SUPER COMPUTER", 1000,    3,      "NANOCARBON ALLOY", "TITANIUM ALLOY", "EXO CHIP")
 Object("SMALL PRINTER",        0,     1, "COMPOUND")
 Object("PACKAGER",             1000,  1, "GRAPHITE")
 Object("TETHERS",              0,     1, "COMPOUND")
@@ -229,7 +232,6 @@ Object("EXO CHIP",             0,     1, "DYNAMITE")
 Object("SMALL CAMERA",         2500,  1, "EXO CHIP")
 Object("HOVERBOARD",           0,     1, "EXO CHIP")
 
-# Tier 2
 Object("TALL STORAGE",                 400,   2, "CERAMIC")
 Object("BUTTON REPEATER",              300,   2, "ZINC")
 Object("DELAY REPEATER",               1000,  2, "ZINC")
@@ -272,7 +274,6 @@ Object("SOLID FUEL THRUSTER",          500,   2, "ALUMINUM",         "AMMONIUM")
 Object("WINCH",                        3750,  2, "EXO CHIP",         "RUBBER")
 Object("HYDRAZINE THRUSTER",           3750,  2, "EXO CHIP",         "STEEL")
 
-# Tier 3
 Object("BUGGY",                   1500, 3, "COMPOUND",         "ALUMINUM")
 Object("RECREATIONAL SPHERE",     4500, 3, "ALUMINUM ALLOY",   "RUBBER")
 Object("LARGE EXTENDED PLATFORM", 500,  3, "RESIN",            "RESIN")
@@ -303,7 +304,6 @@ Object("TRADE PLATFORM",          2500, 3, "IRON",             "TUNGSTEN", "EXO 
 Object("LARGE SHREDDER",          2500, 3, "TUNGSTEN CARBIDE", "IRON",     "EXO CHIP")
 Object("VTOL",                    0,    3, "TUNGSTEN CARBIDE", "SILICONE", "EXO CHIP")
 
-# Tier 4
 Object("MEDIUM SENSOR ARCH",          500,  4, "ZINC",             "QUARTZ")
 Object("LARGE SENSOR RING",           500,  4, "ZINC",             "QUARTZ")
 Object("SMALL SHUTTLE",               1500, 4, "ALUMINUM",         "ALUMINUM")
@@ -331,8 +331,8 @@ Object("LARGE ROVER",                 5000, 4, "ALUMINUM ALLOY",   "RUBBER",  "E
 Object("LARGE SHUTTLE",               5000, 4, "TITANIUM ALLOY",   "CERAMIC", "EXO CHIP", "EXO CHIP")
 # ---- Unorganized - Used for testing and development ----
 # -- Add new resources here if you want to avoid the burden of managing looks --
-# CompResource("COMPUTER", 500, 1, "GLASS", "EXO CHIP")
-# CompResource("SUPER COMPUTER", 1000, 3, "NANOCARBON ALLOY", "TITANIUM ALLOY", "EXO CHIP")
+# Object("COMPUTER", 500, 1, "GLASS", "EXO CHIP")
+# Object("SUPER COMPUTER", 1000, 3, "NANOCARBON ALLOY", "TITANIUM ALLOY", "EXO CHIP")
 
 # ------------------------------------------------------------------------------
 
@@ -411,7 +411,7 @@ def lookup(item, tab=1, times=""):
                 if v.name == dupe.name:
                     dupe_num += 1
 
-            info += lookup(dupe, tab + 1, f"x{dupe_num} ")[:-1]
+            info += lookup(dupe, tab + 1, f"x{dupe_num} ")
             if info.endswith("\n"):
                 info = info[:-1]
             info += "\n"
@@ -497,7 +497,7 @@ while True:
 
             clear()
 
-            if int(tier) > 4 or int(tier) < 1:
+            if int(tier) > highest_tier or int(tier) < lowest_tier:
                 print(f"Could not find tier \"{tier}\"\nThe available tiers are: {lowest_tier}-{highest_tier}\n\n")
                 continue
 
